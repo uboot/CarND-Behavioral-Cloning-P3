@@ -9,7 +9,12 @@ with open('data/driving_log.csv') as csv_file:
     reader = csv.reader(csv_file)
     next(reader)
     for line in reader:
-        samples.append(line)
+        for view in range(3):
+            for flipped in [0, 1]:
+                augmented_line = line.copy()
+                augmented_line.append(view)
+                augmented_line.append(flipped)
+                samples.append(augmented_line)
 
 from sklearn.model_selection import train_test_split
 train_samples, validation_samples = train_test_split(samples, test_size=0.2)
@@ -26,27 +31,28 @@ def generator(samples, batch_size=32):
             images = []
             measurements = []
             correction = 0.2*np.array([0, +1, -1])
-            for batch_sample in batch_samples:
-                for i in range(3):
-                    source_path = line[i].strip()
-                    file_path = os.path.join('data', source_path)
-                    image = cv2.imread(file_path)
-                    measurement = float(line[3]) + correction[i]
-                    images.append(image)
-                    measurements.append(measurement)
+            for line in batch_samples:
+                view = line[7]
+                flipped = line[8]
+                source_path = line[view].strip()
+                file_path = os.path.join('data', source_path)
+                image = cv2.imread(file_path)
+                measurement = float(line[3]) + correction[view]
+                if flipped:
                     images.append(cv2.flip(image, 1))
                     measurements.append(measurement*-1)
+                else:
+                    images.append(image)
+                    measurements.append(measurement)
 
             X_train = np.array(images)
             y_train = np.array(measurements)
-            print(X_train.shape)
-            print(y_train.shape)
             yield shuffle(X_train, y_train)
        
 train_generator = generator(train_samples)
 validation_generator = generator(validation_samples)
 
-from keras.models import Sequential, Model
+from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Cropping2D
 from keras.layers.convolutional import Convolution2D
 from keras.layers.pooling import MaxPooling2D
