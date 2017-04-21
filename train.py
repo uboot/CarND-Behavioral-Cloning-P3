@@ -13,8 +13,6 @@ with open('data/driving_log.csv') as csv_file:
             for flipped in [1, -1]:
                 source_path = os.path.basename(line[view].strip())
                 file_path = os.path.join('data', 'IMG', source_path)
-                angle1 = line[3]
-                angle2 = line[4]
                 if len(line[4]) == 1:
                     angle = 0
                 else:
