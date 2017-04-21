@@ -7,14 +7,25 @@ import numpy as np
 samples = []
 with open('data/driving_log.csv') as csv_file:
     reader = csv.reader(csv_file)
-    next(reader)
-    for line in reader:
+    correction = 0.2*np.array([0, +1, -1])
+    for line in reader:        
         for view in range(3):
-            for flipped in [0, 1]:
-                augmented_line = line.copy()
-                augmented_line.append(view)
-                augmented_line.append(flipped)
-                samples.append(augmented_line)
+            for flipped in [1, -1]:
+                source_path = os.path.basename(line[view].strip())
+                file_path = os.path.join('data', 'IMG', source_path)
+                angle1 = line[3]
+                angle2 = line[4]
+                if len(line[4]) == 1:
+                    angle = 0
+                else:
+                    angle = float(line[3] + '.' + line[4])
+                    
+                data = {
+                    'path': file_path,
+                    'angle': flipped * (angle + correction[view]),
+                    'flipped': flipped
+                }
+                samples.append(data)
 
 from sklearn.model_selection import train_test_split
 train_samples, validation_samples = train_test_split(samples, test_size=0.2)
@@ -30,21 +41,17 @@ def generator(samples, batch_size=32):
 
             images = []
             measurements = []
-            correction = 0.2*np.array([0, +1, -1])
-            for line in batch_samples:
-                view = line[7]
-                flipped = line[8]
-                source_path = line[view].strip()
-                file_path = os.path.join('data', source_path)
+            for sample in batch_samples:
+                file_path = sample['path']
                 image = cv2.imread(file_path)
-                measurement = float(line[3]) + correction[view]
-                if flipped:
+                flipped = sample['flipped']
+                measurement = sample['angle']
+                
+                if flipped == -1:
                     images.append(cv2.flip(image, 1))
-                    measurements.append(measurement*-1)
                 else:
                     images.append(image)
-                    measurements.append(measurement)
-
+                measurements.append(measurement)
             X_train = np.array(images)
             y_train = np.array(measurements)
             yield shuffle(X_train, y_train)
@@ -62,34 +69,36 @@ model.add(Cropping2D(cropping=((50,20), (0,0)), input_shape=(160,320,3)))
 model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=(160,320,3)))
 
 #LeNet
-#model.add(Convolution2D(6, 5, 5, activation='relu'))
-#model.add(MaxPooling2D())
-#model.add(Convolution2D(6, 5, 5, activation='relu'))
-#model.add(MaxPooling2D())
-#model.add(Flatten())
-#model.add(Dense(128))
-#model.add(Dense(84))
-#model.add(Dense(1))
-
-#Nvidia
-model.add(Convolution2D(24, 5, 5, subsample=(2,2), activation='relu'))
-model.add(Convolution2D(36, 5, 5, subsample=(2,2), activation='relu'))
-model.add(Convolution2D(48, 5, 5, subsample=(2,2), activation='relu'))
-model.add(Convolution2D(64, 3, 3, subsample=(2,2), activation='relu'))
-model.add(Convolution2D(64, 3, 3, subsample=(2,2), activation='relu'))
+model.add(Convolution2D(6, 5, 5, activation='relu'))
+model.add(MaxPooling2D())
+model.add(Convolution2D(6, 5, 5, activation='relu'))
+model.add(MaxPooling2D())
 model.add(Flatten())
-model.add(Dense(100))
-model.add(Dense(50))
-model.add(Dense(10))
+model.add(Dense(128))
+model.add(Dense(84))
 model.add(Dense(1))
 
+#Nvidia
+#model.add(Convolution2D(24, 5, 5, subsample=(2,2), activation='relu'))
+#model.add(Convolution2D(36, 5, 5, subsample=(2,2), activation='relu'))
+#model.add(Convolution2D(48, 5, 5, subsample=(2,2), activation='relu'))
+#model.add(Convolution2D(64, 3, 3, subsample=(2,2), activation='relu'))
+#model.add(Convolution2D(64, 3, 3, subsample=(2,2), activation='relu'))
+#model.add(Flatten())
+#model.add(Dense(100))
+#model.add(Dense(50))
+#model.add(Dense(10))
+#model.add(Dense(1))
+
+print (model.count_params())
+print (model.summary())
 
 model.compile(loss='mse', optimizer='adam')
 history_object = model.fit_generator(train_generator,
                                      samples_per_epoch=len(train_samples),
                                      validation_data=validation_generator,
                                      nb_val_samples=len(validation_samples), 
-                                     nb_epoch=6)
+                                     nb_epoch=3)
 
 ### print the keys contained in the history object
 print(history_object.history.keys())
