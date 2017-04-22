@@ -14,7 +14,7 @@ with open('data/driving_log.csv') as csv_file:
                 source_path = os.path.basename(line[view].strip())
                 file_path = os.path.join('data', 'IMG', source_path)
                 if len(line[4]) == 1:
-                    angle = 0
+                    angle = float(line[3])
                 else:
                     angle = float(line[3] + '.' + line[4])
                     
@@ -67,31 +67,31 @@ model.add(Cropping2D(cropping=((50,20), (0,0)), input_shape=(160,320,3)))
 model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=(160,320,3)))
 
 #LeNet
-model.add(Convolution2D(6, 5, 5, activation='relu'))
-model.add(MaxPooling2D())
-model.add(Convolution2D(6, 5, 5, activation='relu'))
-model.add(MaxPooling2D())
-model.add(Flatten())
-model.add(Dense(128))
-model.add(Dense(84))
-model.add(Dense(1))
-
-#Nvidia
-#model.add(Convolution2D(24, 5, 5, subsample=(2,2), activation='relu'))
-#model.add(Convolution2D(36, 5, 5, subsample=(2,2), activation='relu'))
-#model.add(Convolution2D(48, 5, 5, subsample=(2,2), activation='relu'))
-#model.add(Convolution2D(64, 3, 3, subsample=(2,2), activation='relu'))
-#model.add(Convolution2D(64, 3, 3, subsample=(2,2), activation='relu'))
+#model.add(Convolution2D(6, 5, 5, activation='relu'))
+#model.add(MaxPooling2D())
+#model.add(Convolution2D(6, 5, 5, activation='relu'))
+#model.add(MaxPooling2D())
 #model.add(Flatten())
-#model.add(Dense(100))
-#model.add(Dense(50))
-#model.add(Dense(10))
+#model.add(Dense(128))
+#model.add(Dense(84))
 #model.add(Dense(1))
 
-print (model.count_params())
-print (model.summary())
+#Nvidia
+model.add(Convolution2D(24, 5, 5, subsample=(2,2), activation='relu'))
+model.add(Convolution2D(36, 5, 5, subsample=(2,2), activation='relu'))
+model.add(Convolution2D(48, 5, 5, subsample=(2,2), activation='relu'))
+model.add(Convolution2D(64, 3, 3, subsample=(2,2), activation='relu'))
+model.add(Convolution2D(64, 3, 3, subsample=(2,2), activation='relu'))
+model.add(Flatten())
+model.add(Dense(100))
+model.add(Dense(50))
+model.add(Dense(10))
+model.add(Dense(1))
 
 model.compile(loss='mse', optimizer='adam')
+
+print (model.summary())
+
 history_object = model.fit_generator(train_generator,
                                      samples_per_epoch=len(train_samples),
                                      validation_data=validation_generator,
