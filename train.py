@@ -7,7 +7,7 @@ import numpy as np
 samples = []
 with open('data/driving_log.csv') as csv_file:
     reader = csv.reader(csv_file)
-    correction = 0.2*np.array([0, +1, -1])
+    correction = 0.3*np.array([0, +1, -1])
     for line in reader:        
         for view in range(3):
             for flipped in [1, -1]:
@@ -24,9 +24,11 @@ with open('data/driving_log.csv') as csv_file:
                     'flipped': flipped
                 }
                 samples.append(data)
+                
+samples = samples[::5]
 
 from sklearn.model_selection import train_test_split
-train_samples, validation_samples = train_test_split(samples, test_size=0.2)
+train_samples, validation_samples = train_test_split(samples, test_size=0.1)
 
 from sklearn.utils import shuffle
 
@@ -63,7 +65,7 @@ from keras.layers.convolutional import Convolution2D
 from keras.layers.pooling import MaxPooling2D
 
 model = Sequential()
-model.add(Cropping2D(cropping=((50,20), (0,0)), input_shape=(160,320,3)))
+model.add(Cropping2D(cropping=((70,25), (0,0)), input_shape=(160,320,3)))
 model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=(160,320,3)))
 
 #LeNet
@@ -80,8 +82,8 @@ model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=(160,320,3)))
 model.add(Convolution2D(24, 5, 5, subsample=(2,2), activation='relu'))
 model.add(Convolution2D(36, 5, 5, subsample=(2,2), activation='relu'))
 model.add(Convolution2D(48, 5, 5, subsample=(2,2), activation='relu'))
-model.add(Convolution2D(64, 3, 3, subsample=(2,2), activation='relu'))
-model.add(Convolution2D(64, 3, 3, subsample=(2,2), activation='relu'))
+model.add(Convolution2D(64, 3, 3, activation='relu'))
+model.add(Convolution2D(64, 3, 3, activation='relu'))
 model.add(Flatten())
 model.add(Dense(100))
 model.add(Dense(50))
@@ -101,6 +103,8 @@ history_object = model.fit_generator(train_generator,
 ### print the keys contained in the history object
 print(history_object.history.keys())
 
+model.save('model.h5')
+
 import matplotlib.pyplot as plt
 
 ### plot the training and validation loss for each epoch
@@ -112,4 +116,3 @@ plt.xlabel('epoch')
 plt.legend(['training set', 'validation set'], loc='upper right')
 plt.show()
 
-model.save('model.h5')
