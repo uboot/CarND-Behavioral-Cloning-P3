@@ -7,7 +7,7 @@ import numpy as np
 samples = []
 with open('data/driving_log.csv') as csv_file:
     reader = csv.reader(csv_file)
-    correction = 0.3*np.array([0, +1, -1])
+    correction = 0.2*np.array([0, +1, -1])
     for line in reader:        
         for view in range(3):
             for flipped in [1, -1]:
@@ -28,7 +28,7 @@ with open('data/driving_log.csv') as csv_file:
 samples = samples[::5]
 
 from sklearn.model_selection import train_test_split
-train_samples, validation_samples = train_test_split(samples, test_size=0.1)
+train_samples, validation_samples = train_test_split(samples, test_size=0.2)
 
 from sklearn.utils import shuffle
 
@@ -44,6 +44,7 @@ def generator(samples, batch_size=32):
             for sample in batch_samples:
                 file_path = sample['path']
                 image = cv2.imread(file_path)
+                image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
                 flipped = sample['flipped']
                 measurement = sample['angle']
                 
