@@ -4,6 +4,7 @@ import os
 import cv2
 import numpy as np
 
+### read the training data and store the augmented data in a list
 samples = []
 with open('data/driving_log.csv') as csv_file:
     reader = csv.reader(csv_file)
@@ -24,12 +25,17 @@ with open('data/driving_log.csv') as csv_file:
                     'flipped': flipped
                 }
                 samples.append(data)
-                
+
+### sub-sample the data
 samples = samples[::5]
 
+### split the sub-sampled data in training and validation data
 from sklearn.model_selection import train_test_split
+
 train_samples, validation_samples = train_test_split(samples, test_size=0.2)
 
+### this generator functions reads and pre-processes the actual training images
+### for a given (small) subset of the input samples 
 from sklearn.utils import shuffle
 
 def generator(samples, batch_size=32):
@@ -56,30 +62,26 @@ def generator(samples, batch_size=32):
             X_train = np.array(images)
             y_train = np.array(measurements)
             yield shuffle(X_train, y_train)
-       
+            
+### create generators which output subsets of the training and the validation
+### data, respectively
 train_generator = generator(train_samples)
 validation_generator = generator(validation_samples)
 
+
+### create the CNN
 from keras.models import Sequential
 from keras.layers import Flatten, Dense, Lambda, Cropping2D
 from keras.layers.convolutional import Convolution2D
 from keras.layers.pooling import MaxPooling2D
 
 model = Sequential()
+
+### crop and normalize the images...
 model.add(Cropping2D(cropping=((70,25), (0,0)), input_shape=(160,320,3)))
 model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=(160,320,3)))
 
-#LeNet
-#model.add(Convolution2D(6, 5, 5, activation='relu'))
-#model.add(MaxPooling2D())
-#model.add(Convolution2D(6, 5, 5, activation='relu'))
-#model.add(MaxPooling2D())
-#model.add(Flatten())
-#model.add(Dense(128))
-#model.add(Dense(84))
-#model.add(Dense(1))
-
-#Nvidia
+### ... and setup the Nvidia architecture
 model.add(Convolution2D(24, 5, 5, subsample=(2,2), activation='relu'))
 model.add(Convolution2D(36, 5, 5, subsample=(2,2), activation='relu'))
 model.add(Convolution2D(48, 5, 5, subsample=(2,2), activation='relu'))
@@ -91,24 +93,23 @@ model.add(Dense(50))
 model.add(Dense(10))
 model.add(Dense(1))
 
+### train the model
 model.compile(loss='mse', optimizer='adam')
-
 print (model.summary())
-
 history_object = model.fit_generator(train_generator,
                                      samples_per_epoch=len(train_samples),
                                      validation_data=validation_generator,
                                      nb_val_samples=len(validation_samples), 
                                      nb_epoch=3)
 
-### print the keys contained in the history object
+### print the history and save the model
 print(history_object.history.keys())
-
 model.save('model.h5')
 
+
+### finally, plot the training and validation loss for each epoch
 import matplotlib.pyplot as plt
 
-### plot the training and validation loss for each epoch
 plt.plot(history_object.history['loss'])
 plt.plot(history_object.history['val_loss'])
 plt.title('model mean squared error loss')
