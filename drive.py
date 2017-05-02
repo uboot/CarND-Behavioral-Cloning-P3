@@ -88,6 +88,9 @@ def connect(sid, environ):
 
 
 def send_control(steering_angle, throttle):
+    # replace the decimal point by a comma in the steering angle because the
+    # simulator expects it this way on my system (German session on
+    # openSUSE Linux)
     sio.emit(
         "steer",
         data={

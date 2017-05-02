@@ -14,10 +14,14 @@ with open('data/driving_log.csv') as csv_file:
             for flipped in [1, -1]:
                 source_path = os.path.basename(line[view].strip())
                 file_path = os.path.join('data', 'IMG', source_path)
+                
+                # this is a hack for comma based floating point numbers which
+                # were output by the simulator on my system (German session on
+                # openSUSE Linux)
                 if len(line[4]) == 1:
-                    angle = float(line[3])
+                    angle = float(line[3]) # 0 -> 0
                 else:
-                    angle = float(line[3] + '.' + line[4])
+                    angle = float(line[3] + '.' + line[4]) # 0,123 -> 0.123
                     
                 data = {
                     'path': file_path,
