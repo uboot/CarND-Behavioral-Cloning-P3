@@ -83,7 +83,7 @@ model = Sequential()
 
 ### crop and normalize the images...
 model.add(Cropping2D(cropping=((70,25), (0,0)), input_shape=(160,320,3)))
-model.add(Lambda(lambda x: x / 255.0 - 0.5, input_shape=(160,320,3)))
+model.add(Lambda(lambda x: x / 255.0 - 0.5))
 
 ### ... and setup the Nvidia architecture
 model.add(Convolution2D(24, 5, 5, subsample=(2,2), activation='relu'))
