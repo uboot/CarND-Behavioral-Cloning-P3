@@ -10,12 +10,11 @@ The goals / steps of this project are the following:
 
 [//]: # (Image References)
 
-[image1]: ./example_center.png "Normal image"
+[image1]: ./example_center.jpg "Normal image"
 
 ## Rubric Points
-ere I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
+Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
 
----
 ### Files Submitted & Code Quality
 
 #### 1. Submission includes all required files and can be used to run the simulator in autonomous mode
@@ -29,7 +28,9 @@ My project includes the following files:
 
 #### 2. Submission includes functional code
 Using the Udacity provided simulator and my drive.py file, the car can in principal be driven autonomously around the track by executing 
-```sh python drive.py model.h5
+
+```
+python drive.py model.h5
 ```
 
 However, the code contains a fix for system which use commas as decimal separator on
