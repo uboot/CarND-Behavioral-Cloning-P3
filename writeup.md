@@ -7,13 +7,11 @@ The goals / steps of this project are the following:
 * Test that the model successfully drives around track one without leaving the road
 * Summarize the results with a written report
 
+Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
 
 [//]: # (Image References)
 
 [image1]: ./example_center.jpg "Normal image"
-
-## Rubric Points
-Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/432/view) individually and describe how I addressed each point in my implementation.  
 
 ### Files Submitted & Code Quality
 
@@ -40,7 +38,7 @@ lines 51-52. Change these lines to use the code on a system with English locale.
 
 The model.py file contains the code for training and saving the convolution neural network. The file shows the pipeline I used for training and validating the model, and it contains comments to explain how the code works.
 
-###Model Architecture and Training Strategy
+### Model Architecture and Training Strategy
 
 #### 1. An appropriate model architecture has been employed
 
@@ -58,7 +56,7 @@ The model was tested by running it through the simulator and ensuring that the v
 
 The model used an adam optimizer, so the learning rate was not tuned manually (code line line 101).
 
-####4 . Appropriate training data
+#### 4 . Appropriate training data
 
 Training data was acquired by driving several laps on track 1 in both directions.  I wanted to try how the model would train with "normal" driving data so I decided not to acquire any recovery data but a rather large amount of conventional driving. Furthermore I selected only one out of five subsequent frames  to reduce the amount of data. It turned out that this data was sufficient.
 
