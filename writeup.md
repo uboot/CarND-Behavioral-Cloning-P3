@@ -31,7 +31,7 @@ Using the Udacity provided simulator and my drive.py file, the car can in princi
 python drive.py model.h5
 ```
 
-However, the code contains a fix for system which use commas as decimal separator on
+However, the code contains a fix for systems which use commas as decimal separator on
 lines 51-52. Change these lines to use the code on a system with English locale.
 
 #### 3. Submission code is usable and readable
@@ -103,7 +103,7 @@ The final model architecture (model.py lines 85-98) consisted of a convolution n
 
 #### 3. Creation of the Training Set & Training Process
 
-To capture good driving behavior, I first recorded two laps on track one using center lane driving. Here is an example image of center lane driving:
+To capture good driving behavior, I first recorded several laps on track one in each direction using center lane driving. Here is an example image of center lane driving:
 
 ![alt text][image1]
 
@@ -111,4 +111,4 @@ After the collection process, I had 66762 images (including left and right image
 
 I finally randomly shuffled the data set and put 20% of the data into a validation set. 
 
-I used this training data for training the model. The validation set helped determine if the model was over or under fitting. The ideal number of epochs was 3 as evidenced by training the model with more epochs and looking at the performance of the training set versus the validation set. I used an adam optimizer so that manually training the learning rate wasn't necessary.
+I used this training data for training the model. The validation set helped to determine if the model was over or under fitting. The ideal number of epochs was 3 as evidenced by training the model with more epochs and looking at the performance of the training set versus the validation set. I used an adam optimizer so that manually training the learning rate wasn't necessary.
